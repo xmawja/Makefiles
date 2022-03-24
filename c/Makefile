@@ -32,17 +32,14 @@ BLDDIR	= $(DEPDIR) $(OBJDIR)
 # Search for the directorys
 VPATH	= $(APPDIR) $(BLDDIR) 
 
-# All target variable
-all:    $(TARGET)
-
 # declaration variables
-RM	= rm -f
-RMDIR	= rm -rf
+REMOVE	= rm -rf
+
 # Directorys variables
 SOURCES	:= $(wildcard $(VPATH)/*.c)
 HEADERS := $(wildcard $(VPATH)/*.h)
-PREPROS	:= $(SOURCES:$(SRCDIR)/%.c=$(PREDIR)/$.c)
-COMPILE := $(SOURCES:$(PREDIR)/$.c=$(CMPDIR)/$.s)
+PREPROS	:= $(SOURCES:$(SRCDIR)/%.c=$(PREDIR)/%.c)
+COMPILE := $(SOURCES:$(PREDIR)/%.c=$(CMPDIR)/%.s)
 OBJECTS	:= $(SOURCES:$(CMPDIR)/%.s=$(OBJDIR)/%.o)
 DEPS	:= $(OBJECTS:$(OBJDIR)/%.o=$(DEPDIR)/%.d)
 
@@ -52,7 +49,7 @@ DEPS	:= $(OBJECTS:$(OBJDIR)/%.o=$(DEPDIR)/%.d)
 # Preprocessing
 $(PREPROS): $(SRCDIR)/%.c : $(PREDIR)/%.c
 	mkdir -p $(PREDIR)
-	$(CC) $(CFLAGS) -E -o $(DEPDIR)/%.c $(VPATH)/$.c
+	$(CC) $(CFLAGS) -E -o $(DEPDIR)/%.c $(VPATH)/%.c
 	@echo "Preprocessing ... $<"
 
 # Comilation
@@ -84,16 +81,17 @@ test:
 # Clean
 .PHONY: clean
 clean:
-	$(RM) $(OBJECTS) $(OBJDIR) $(BINDIR) $(DEPDIR)
+	$(REMOVE) $(OBJECTS) $(OBJDIR) $(BINDIR) $(DEPDIR)
 	@echo "Deleted ...$<"
 
 # remove all target with deps 
 .PHONY: remove
 remove:
-	$(RMDIR) $(BINDIR)/$(TARGET)
-	$(RMDIR) $(OBJECTS)
-	$(RMDIR) $(DEPS)
+	$(REMOVE) $(BINDIR)/$(TARGET)
+	$(REMOVE) $(OBJECTS)
+	$(REMOVE) $(DEPS)
 	@echo "Deleted $<"
 
 # PHONY target variables
 .PHONY: all
+all:	$(BINDIR)/$(TARGET)
