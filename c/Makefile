@@ -31,12 +31,18 @@ all:    $(TARGET)
 # declaration variables
 RM	= rm -f
 RMDIR	= rm -rf
+# Directorys variables
+SOURCES	:= $(wildcard $(SRCDIR)/*.c)
+HEADERS := $(wildcard $(HDRDIR)/*.h)
+OBJECTS	:= $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+DEPS	:= $(OBJECTS:$(OBJDIR)/%.o=$(DEPDIR)/%.d)
 
 ##########################################################
 ##                      COMPILATION                     ##
 ##########################################################
 # Preprocessing
 pre:
+	mkdir -p $(DEPDIR)
 	$(CC) $(CFLAGS) -E -o main_expanded.c main.c
 	@echo "Preprocessing ..."
 
