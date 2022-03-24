@@ -31,3 +31,28 @@ all:    $(TARGET)
 # declaration variables
 RM  = rm -f
 RMDIR   = rm -rf
+
+##########################################################
+##                      COMPILATION                     ##
+##########################################################
+# Preprocessing
+pre:
+	$(CC) $(CFLAGS) -E -o main_expanded.c main.c
+	@echo "Preprocessing ..."
+
+# Comilation
+cop: main_expanded.c
+	$(CC) $(CFLAGS) -S $^
+	@echo "Compiling ..."
+
+# Assembling
+%.o: %.c %.h
+	mkdir -p $(OBJDIR)
+	$(CC) $(CFLAGS) -c $^
+	@echo "Assembling ..."
+
+# Linking
+$(TARGET): main.o
+	mkdir -p $(BINDIR)
+	$(CC) $(CFLAGS) main.o -o $@
+	@echo "Linking ..."
