@@ -56,3 +56,24 @@ $(TARGET): main.o
 	mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) main.o -o $@
 	@echo "Linking ..."
+
+##########################################################
+##                      PHONYS                          ##
+##########################################################
+# Test
+.PHONY: test
+test:
+	$()
+
+# Clean
+.PHONY: clean
+clean:
+	$(RM) *.o $(TARGET)
+	
+# remove
+.PHONY: remove
+remove:
+	$(RMDIR) $(OBJDIR) $(BINDIR)
+
+# PHONY target variables
+.PHONY: all
