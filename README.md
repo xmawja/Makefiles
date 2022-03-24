@@ -1,3 +1,3 @@
 # Makefiles
 
-✨  A Generic Collection of Makefiles for all Programming Language architect by structure Projects. 
+✨  A Generic Collection of Makefiles for all Programming Language Architect by Projects Structure. 
