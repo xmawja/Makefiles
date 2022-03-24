@@ -18,12 +18,19 @@ TARGET	= name
 # Directorys
 SRCDIR	= src
 HDRDIR	= inc
+TESDIR  = test
+PREDIR	= pros
+CMPDIR	= comp
 OBJDIR	= obj
 BINDIR	= bin
 DEPDIR	= dep
 DATDIR	= data
 DOCDIR	= doc
-TESDIR	= test
+# Organize directorys
+APPDIR	= $(SRCDIR) $(HDRDIR) $(TESDIR)
+BLDDIR	= $(DEPDIR) $(OBJDIR)
+# Search for the directorys
+VPATH	= $(APPDIR) $(BLDDIR) 
 
 # All target variable
 all:    $(TARGET)
@@ -32,35 +39,38 @@ all:    $(TARGET)
 RM	= rm -f
 RMDIR	= rm -rf
 # Directorys variables
-SOURCES	:= $(wildcard $(SRCDIR)/*.c)
-HEADERS := $(wildcard $(HDRDIR)/*.h)
-OBJECTS	:= $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+SOURCES	:= $(wildcard $(VPATH)/*.c)
+HEADERS := $(wildcard $(VPATH)/*.h)
+PREPROS	:= $(SOURCES:$(SRCDIR)/%.c=$(PREDIR)/$.c)
+COMPILE := $(SOURCES:$(PREDIR)/$.c=$(CMPDIR)/$.s)
+OBJECTS	:= $(SOURCES:$(CMPDIR)/%.s=$(OBJDIR)/%.o)
 DEPS	:= $(OBJECTS:$(OBJDIR)/%.o=$(DEPDIR)/%.d)
 
 ##########################################################
 ##                      COMPILATION                     ##
 ##########################################################
 # Preprocessing
-pre:
-	mkdir -p $(DEPDIR)
-	$(CC) $(CFLAGS) -E -o main_expanded.c main.c
-	@echo "Preprocessing ..."
+$(PREPROS): $(SRCDIR)/%.c : $(PREDIR)/%.c
+	mkdir -p $(PREDIR)
+	$(CC) $(CFLAGS) -E -o $(DEPDIR)/%.c $(VPATH)/$.c
+	@echo "Preprocessing ... $<"
 
 # Comilation
-cop: main_expanded.c
+$(COMPILE): $(PREDIR)/$.c : $(CMPDIR)%.s
+	mkdir -p $(CMPDIR)
 	$(CC) $(CFLAGS) -S $^
-	@echo "Compiling ..."
+	@echo "Compiling ... $<"
 
 # Assembling
-%.o: %.c %.h
+$(OBJECTS): $(CMPDIR)%.s : $(HEADERS)%.h
 	mkdir -p $(OBJDIR)
 	$(CC) $(CFLAGS) -c $^
-	@echo "Assembling ..."
+	@echo "Assembling ... $<"
 
 # Linking
-$(TARGET): main.o
+$(BINDIR)/$(TARGET): $(OBJECTS)
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) main.o -o $@
+	$(CC) $(CFLAGS) $(OBJECTS) -o $@
 	@echo "Linking ..."
 
 ##########################################################
@@ -74,12 +84,16 @@ test:
 # Clean
 .PHONY: clean
 clean:
-	$(RM) *.o $(TARGET)
-	
-# remove
+	$(RM) $(OBJECTS) $(OBJDIR) $(BINDIR) $(DEPDIR)
+	@echo "Deleted ...$<"
+
+# remove all target with deps 
 .PHONY: remove
 remove:
-	$(RMDIR) $(OBJDIR) $(BINDIR)
+	$(RMDIR) $(BINDIR)/$(TARGET)
+	$(RMDIR) $(OBJECTS)
+	$(RMDIR) $(DEPS)
+	@echo "Deleted $<"
 
 # PHONY target variables
 .PHONY: all
